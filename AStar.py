@@ -1,6 +1,5 @@
 import heapq
 
-
 # 定义节点信息，用于表示待搜索的图
 class Node:
     """
@@ -92,26 +91,8 @@ def astar(map_grid, map_start, map_end):
 
     return None  # 没有找到路径
 
-
 def add_to_open(open_list, neighbor):
     for node in open_list:
         if neighbor == node and neighbor.g >= node.g:
             return False
     return True
-
-if __name__ == "__main__":
-    # 测试代码
-    grid = [
-        [0, 0, 0, 0, 0],
-        [1, 1, 0, 1, 0],
-        [0, 0, 0, 1, 0],
-        [0, 1, 0, 0, 0],
-        [0, 0, 0, 1, 0]
-    ]
-    start = (0, 0)
-    end = (4, 4)
-    path = astar(grid, start, end)
-    if path:
-        print("找到路径:", path)
-    else:
-        print("未找到路径")
