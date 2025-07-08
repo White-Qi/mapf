@@ -1,6 +1,7 @@
 from AStar import astar
 from Dijkstra import dijkstra
 from GreedyBestFirstSearch import greedy_best_first_search
+from SIPP import sipp
 import time
 import random
 
@@ -33,7 +34,8 @@ if __name__ == "__main__":
     algorithms = [
         (astar, "A*算法"),
         (dijkstra, "Dijkstra算法"),
-        (greedy_best_first_search, "贪婪最佳优先搜索")
+        (greedy_best_first_search, "贪婪最佳优先搜索"),
+        (sipp, "SIPP算法")
     ]
 
     print("地图大小:", size, "x", size)
