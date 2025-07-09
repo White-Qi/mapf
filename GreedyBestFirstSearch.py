@@ -10,7 +10,7 @@ class Node:
         return self.position == other.position
 
     def __lt__(self, other):
-        return self.h < other.h  # 仅比较启发值 h(n)
+        return self.h < other.h  # just compare based on heuristic value
 
 
 def greedy_best_first_search(map_grid, map_start, map_end):
@@ -23,7 +23,7 @@ def greedy_best_first_search(map_grid, map_start, map_end):
     open_list = []
     closed_set = set()
 
-    # 启发函数：曼哈顿距离
+    # manhattan distance heuristic
     start_node.h = abs(map_start[0] - map_end[0]) + abs(map_start[1] - map_end[1])
 
     heapq.heappush(open_list, start_node)
@@ -52,8 +52,8 @@ def greedy_best_first_search(map_grid, map_start, map_end):
                 neighbor_node = Node(current_node, neighbor_pos)
                 neighbor_node.h = abs(nr - map_end[0]) + abs(nc - map_end[1])
 
-                # 如果未被加入过，就添加进 open list
+                # check if the neighbor node is already in the open list
                 if not any(neighbor_node == node and neighbor_node.h >= node.h for node in open_list):
                     heapq.heappush(open_list, neighbor_node)
 
-    return None  # 没有找到路径
+    return None  # not found a path

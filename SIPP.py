@@ -4,10 +4,10 @@ class State:
     def __init__(self, parent=None, position=None, interval=0, time=0):
         self.parent = parent
         self.position = position  # (x, y)
-        self.interval = interval  # 安全区间索引
-        self.time = time          # 到达时间
-        self.g = float('inf')     # 实际成本（时间）
-        self.h = 0                # 启发式估计到目标的时间
+        self.interval = interval  # safe interval index
+        self.time = time          # current time
+        self.g = float('inf')     # from start to this state
+        self.h = 0                # heuristic (estimated cost to goal)
         self.f = float('inf')     # f = g + h
 
     def __eq__(self, other):
@@ -17,12 +17,9 @@ class State:
         return self.f < other.f
 
 def get_timeline(position):
-    """
-    返回一个位置的 timeline（安全区间列表）[(start_time, end_time), ...]
-    """
     x, y = position
 
-    # 假设动态障碍物从右往左移动，每 2 秒经过一次 (0,2)
+    # assumption dynamic obstacles move from left to right(2 seconds)
     if y == 2:
         return [
             (0, 1),     # Safe interval 0
@@ -30,7 +27,7 @@ def get_timeline(position):
             (5, float('inf'))  # Safe interval 2
         ]
     else:
-        # 其他位置都是无限安全
+        # other positions are always safe
         return [(0, float('inf'))]
 
 def get_successors(current_state, map_grid, dynamic_obstacles, goal_pos):
@@ -42,21 +39,21 @@ def get_successors(current_state, map_grid, dynamic_obstacles, goal_pos):
         nx, ny = x + dx, y + dy
         new_position = (nx, ny)
 
-        # 检查边界
+        # check bounds
         if nx < 0 or ny < 0 or nx >= len(map_grid) or ny >= len(map_grid[0]):
             continue
 
-        # 检查静态障碍
+        # check obstacles
         if map_grid[nx][ny] != 0:
             continue
 
-        # 获取新位置的时间线
+        # get the timeline for the new position
         timeline = get_timeline(new_position)
 
-        # 计算到达时间（假设每一步耗时 1 秒）
+        # calculate the arrival time
         arrival_time = current_state.time + 1
 
-        # 查找该时间落在哪个安全区间
+        # find the safe interval for the arrival time
         for idx, (start, end) in enumerate(timeline):
             if start <= arrival_time <= end:
                 new_state = State(
@@ -69,7 +66,7 @@ def get_successors(current_state, map_grid, dynamic_obstacles, goal_pos):
                 new_state.h = abs(nx - goal_pos[0]) + abs(ny - goal_pos[1])
                 new_state.f = new_state.g + new_state.h
                 successors.append(new_state)
-                break  # 只能在一个安全区间内
+                break
 
     return successors
 
@@ -77,7 +74,6 @@ def sipp(grid, start_pos, goal_pos):
     open_list = []
     closed_set = {}
 
-    # 初始化起点
     start_state = State(position=start_pos, interval=0, time=0)
     start_state.g = 0
     start_state.h = abs(start_pos[0] - goal_pos[0]) + abs(start_pos[1] - goal_pos[1])
@@ -87,7 +83,7 @@ def sipp(grid, start_pos, goal_pos):
     while open_list:
         _, _, current = heapq.heappop(open_list)
 
-        # 检查是否到达目标
+        # check reached the goal
         if current.position == goal_pos:
             path = []
             while current:
@@ -101,10 +97,10 @@ def sipp(grid, start_pos, goal_pos):
 
         closed_set[key] = current
 
-        # 生成后继状态
+        # generate successors nodes
         for successor in get_successors(current, grid, None, goal_pos):
             key_succ = (successor.position, successor.interval)
             if key_succ not in closed_set or successor.g < closed_set[key_succ].g:
                 heapq.heappush(open_list, (successor.f, id(successor), successor))
 
-    return None  # 无解
+    return None  # no path found

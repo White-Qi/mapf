@@ -2,7 +2,7 @@ def dijkstra(map_grid, map_start, map_end):
     rows, cols = len(map_grid), len(map_grid[0])
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    # 初始化距离字典和前驱节点字典
+    # initialize distances and predecessors
     distances = { (r, c): float('inf') for r in range(rows) for c in range(cols) }
     distances[map_start] = 0
     predecessors = {}
@@ -11,7 +11,6 @@ def dijkstra(map_grid, map_start, map_end):
     visited = set()
 
     while open_list:
-        # 手动在列表中查找距离最小的节点
         current_dist, current_pos = min(open_list, key=lambda x: x[0])
         open_list.remove((current_dist, current_pos))
 
@@ -19,8 +18,9 @@ def dijkstra(map_grid, map_start, map_end):
             continue
         visited.add(current_pos)
 
+        # find the shortest path to the end
         if current_pos == map_end:
-            break  # 找到了终点
+            break
 
         r, c = current_pos
 
@@ -34,12 +34,12 @@ def dijkstra(map_grid, map_start, map_end):
                 if new_dist < distances[neighbor]:
                     distances[neighbor] = new_dist
                     predecessors[neighbor] = current_pos
-                    # 直接将邻居节点添加到列表中
+                    # add to open list if not already present
                     open_list.append((new_dist, neighbor))
 
-    # 回溯路径
+    # backtrack to find the path
     if map_end not in predecessors and map_end != map_start:
-        # 如果终点无法到达，返回 None
+        # end node is unreachable
         if distances[map_end] == float('inf'):
             return None
 
